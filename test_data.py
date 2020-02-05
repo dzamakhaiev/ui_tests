@@ -9,3 +9,6 @@ LOGIN_PAGE = 'https://elektroshokery.in.ua/login/'
 ACCOUNT_PAGE = 'https://elektroshokery.in.ua/my-account/'
 CHECKOUT_PAGE = 'https://elektroshokery.in.ua/checkout/'
 CART_PAGE = 'https://elektroshokery.in.ua/shopping-cart/'
+
+# Products
+PRODUCT_MARKER = 'Электрошокер'
