@@ -1,16 +1,36 @@
-from driver import Driver
+from driver import BaseDriver
 import locators
 
 
 class BasePage:
 
+    instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls.instance:
+            cls.instance = super(BasePage, cls).__new__(cls)
+        return cls.instance
+
     def __init__(self, driver, url):
         """
-        :param Driver driver: object for work with webdriver
+        :param BaseDriver driver: object for work with webdriver
         :param str url: base url for that page
         """
         self.driver = driver
         self.base_url = url
+        self.driver.go_to(self.base_url)
+
+    def get_driver(self):
+        return self.driver
+
+    def set_driver(self, driver):
+        self.driver = driver
+
+    def get_current_url(self):
+        return self.driver.get_current_url()
+
+    def quit(self):
+        self.driver.quit()
 
 
 class MainPage(BasePage):
