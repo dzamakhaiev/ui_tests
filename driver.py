@@ -4,7 +4,7 @@ from selenium.webdriver import Chrome
 import config
 
 
-class Driver:
+class BaseDriver:
 
     def __init__(self, driver):
         """
@@ -51,7 +51,7 @@ class Driver:
         self.driver.close()
 
 
-class ChromeDriver(Driver):
+class ChromeDriver(BaseDriver):
 
     def __init__(self, driver_path=config.CHROMEDRIVER_PATH):
         driver = Chrome(executable_path=driver_path)
