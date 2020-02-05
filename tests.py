@@ -1,8 +1,9 @@
-import unittest
 import random
-from driver import ChromeDriver
-import test_data
+import unittest
+
 import pages
+import test_data
+from driver import ChromeDriver
 
 
 class ChromeTest(unittest.TestCase):
@@ -10,6 +11,9 @@ class ChromeTest(unittest.TestCase):
     def setUp(self):
         # Start test case from Main page like regular user
         self.current_page = pages.MainPage(driver=ChromeDriver(), url=test_data.MAIN_PAGE)
+
+    def tearDown(self):
+        self.current_page.quit()
 
     def log_in(self):
         # Start from Main page
@@ -25,6 +29,31 @@ class ChromeTest(unittest.TestCase):
         # After log in current page will be Account page
         driver = self.current_page.get_driver()
         self.current_page = pages.AccountPage(driver=driver, url=test_data.ACCOUNT_PAGE)
+
+    @staticmethod
+    def format_product_desc(product_desc):
+        """
+        :param str product_desc:
+        """
+        lines = product_desc.split('\n')
+        for line in lines:
+            if test_data.PRODUCT_MARKER in line:
+                return line.strip()
+
+        return product_desc.split('\n')[0].strip()
+
+    def check_product_in_cart(self, items, product_desc):
+        """
+        :param list items:
+        :param str product_desc:
+        """
+        product_desc = self.format_product_desc(product_desc)
+
+        for item in items:
+            if product_desc in item.text:
+                break
+        else:
+            self.fail(f'Product {product_desc} not found in cart items')
 
     def test_login(self):
         # Start from Main page and log in to reach Account page
@@ -50,11 +79,20 @@ class ChromeTest(unittest.TestCase):
         # Pick up random product
         products = main_page.get_product_list()
         product = random.choice(products)
+        product_desc = product.text
 
         # Try to add product to cart
         main_page.add_product_to_cart(product)
 
         # Check cart
+        driver = main_page.get_driver()
+        cart_page = pages.CartPage(driver=driver, url=test_data.CART_PAGE)
+        self.current_page = cart_page
+        items = cart_page.get_items_table()
+        self.check_product_in_cart(items=items, product_desc=product_desc)
+
+        # Clean up a cart
+        cart_page.clean_cart()
 
 
 if __name__ == '__main__':
