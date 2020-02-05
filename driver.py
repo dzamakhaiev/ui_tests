@@ -1,7 +1,26 @@
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver import Chrome
+from selenium.common.exceptions import NoSuchElementException
 import config
+
+
+def no_such_element_exception(find):
+    def wrap(self, *args, **kwargs):
+        try:
+            return find(self, *args, **kwargs)
+        except NoSuchElementException:
+            return None
+    return wrap
+
+
+def no_such_elements_exception(find):
+    def wrap(self, *args, **kwargs):
+        try:
+            return find(self, *args, **kwargs)
+        except NoSuchElementException:
+            return []
+    return wrap
 
 
 class BaseDriver:
@@ -36,6 +55,7 @@ class BaseDriver:
     def get_current_url(self):
         return self.driver.current_url
 
+    @no_such_element_exception
     def find_element(self, locator, element=None):
         """
         :param tuple locator:
@@ -46,11 +66,22 @@ class BaseDriver:
         else:
             return element.find_element(*locator)
 
-    def find_elements(self, locator):
-        return self.driver.find_elements(*locator)
+    @no_such_elements_exception
+    def find_elements(self, locator, element=None):
+        """
+        :param tuple locator:
+        :param WebElement element:
+        """
+        if not element:
+            return self.driver.find_elements(*locator)
+        else:
+            return element.find_elements(*locator)
 
-    def click_on_element(self, locator, element=None):
-        self.find_element(locator, element).click()
+    def click_on_element(self, locator=None, element=None):
+        if not locator and element:
+            element.click()
+        else:
+            self.find_element(locator, element).click()
 
     def input_text(self, locator, text, element=None):
         field = self.find_element(locator, element)
@@ -58,10 +89,6 @@ class BaseDriver:
 
     def quit(self):
         self.driver.quit()
-
-    def __del__(self):
-        # Cannot use here quit() due to issue: https://github.com/SeleniumHQ/selenium/issues/3330
-        self.driver.close()
 
 
 class ChromeDriver(BaseDriver):
