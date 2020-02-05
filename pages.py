@@ -64,4 +64,19 @@ class AccountPage(BasePage):
 
 
 class CartPage(BasePage):
-    pass
+
+    def get_items_table(self):
+        table = self.driver.find_element(locators.CartPageLocators.CART_TABLE)
+        if not table: return []
+
+        rows = self.driver.find_elements(locator=locators.CartPageLocators.CAR_ROW, element=table)
+        if not rows: return []
+        return rows[1:]
+
+    def clean_cart(self):
+        items_table = self.get_items_table()
+
+        while len(items_table):
+            links = self.driver.find_elements(locator=locators.CartPageLocators.DELETE_ITEM, element=items_table[-1])
+            self.driver.click_on_element(element=links[-1])
+            items_table = self.get_items_table()
