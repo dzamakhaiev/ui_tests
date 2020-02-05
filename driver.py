@@ -6,6 +6,13 @@ import config
 
 class BaseDriver:
 
+    instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls.instance:
+            cls.instance = super(BaseDriver, cls).__new__(cls)
+        return cls.instance
+
     def __init__(self, driver):
         """
         :param WebDriver driver:
@@ -26,6 +33,9 @@ class BaseDriver:
     def go_to(self, url):
         self.driver.get(url)
 
+    def get_current_url(self):
+        return self.driver.current_url
+
     def find_element(self, locator, element=None):
         """
         :param tuple locator:
@@ -45,6 +55,9 @@ class BaseDriver:
     def input_text(self, locator, text, element=None):
         field = self.find_element(locator, element)
         field.send_keys(text)
+
+    def quit(self):
+        self.driver.quit()
 
     def __del__(self):
         # Cannot use here quit() due to issue: https://github.com/SeleniumHQ/selenium/issues/3330
