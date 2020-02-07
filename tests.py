@@ -40,15 +40,10 @@ class ChromeTest(unittest.TestCase):
         """
         :param str product_desc: line with product description
         """
-        lines = product_desc.split('\n')
-        desc = ''
-        price = 0.0
-
-        for line in lines:
-            if test_data.PRODUCT_MARKER in line and not line:
-                desc = line
-            if test_data.PRICE_MARKER in line and not price:
-                price = line.split(' ')[0]
+        parts = product_desc.split('\n')
+        price = parts[-1].split(' ')
+        price = ''.join([p for p in price[:-1]])
+        desc = [p for p in parts if test_data.PRODUCT_MARKER in p and test_data.IGNORE_MARKER not in p][0]
 
         return desc, float(price)
 
@@ -121,21 +116,18 @@ class ChromeTest(unittest.TestCase):
         driver = self.current_page.get_driver()
         main_page = pages.MainPage(driver=driver, url=test_data.MAIN_PAGE)
 
-        # Pick up few random products
-        number_of_products = 3
-        products = main_page.get_product_list()
-        p_list = [random.choice(products) for _ in range(number_of_products)]
-
-        # Try to add products to cart
+        # Pick up few random products and try to add them  into cart
         count = 0
         exp_total = 0.0
-        for product in p_list:
-            for i in range(random.randint(1, number_of_products)):
+        number_of_products = 10
 
-                main_page.add_product_to_cart(product)
-                desc, price = self.format_product_desc(product.text)
-                count += 1
-                exp_total += price
+        for i in range(random.randint(1, number_of_products)):
+            products = main_page.get_product_list()
+            product = random.choice(products)
+            main_page.add_product_to_cart(product)
+            desc, price = self.format_product_desc(product.text)
+            count += 1
+            exp_total += price
 
         # Check number of products and total price
         cart_total = main_page.get_cart_total()
