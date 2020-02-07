@@ -1,6 +1,5 @@
 import random
 import unittest
-
 import pages
 import test_data
 from driver import ChromeDriver
@@ -13,6 +12,12 @@ class ChromeTest(unittest.TestCase):
         self.current_page = pages.MainPage(driver=ChromeDriver(), url=test_data.MAIN_PAGE)
 
     def tearDown(self):
+        # Clean a cart
+        driver = self.current_page.get_driver()
+        cart_page = pages.CartPage(driver=driver, url=test_data.CART_PAGE)
+        cart_page.clean_cart()
+        self.current_page = cart_page
+
         self.current_page.quit()
 
     def log_in(self):
@@ -33,21 +38,38 @@ class ChromeTest(unittest.TestCase):
     @staticmethod
     def format_product_desc(product_desc):
         """
-        :param str product_desc:
+        :param str product_desc: line with product description
         """
         lines = product_desc.split('\n')
-        for line in lines:
-            if test_data.PRODUCT_MARKER in line:
-                return line.strip()
+        desc = ''
+        price = 0.0
 
-        return product_desc.split('\n')[0].strip()
+        for line in lines:
+            if test_data.PRODUCT_MARKER in line and not line:
+                desc = line
+            if test_data.PRICE_MARKER in line and not price:
+                price = line.split(' ')[0]
+
+        return desc, float(price)
+
+    @staticmethod
+    def format_cart_total(cart_total):
+        """
+        :param str cart_total: string with number of products and total price
+        """
+        cart_total = cart_total.replace('(', '').replace(')', '')
+        cart_total = cart_total.split(' ')
+        cart_total = cart_total[1:-1]
+        number = cart_total.pop(0)
+        price = ''.join(digits for digits in cart_total)
+        return int(number), float(price)
 
     def check_product_in_cart(self, items, product_desc):
         """
         :param list items:
         :param str product_desc:
         """
-        product_desc = self.format_product_desc(product_desc)
+        product_desc, _ = self.format_product_desc(product_desc)
 
         for item in items:
             if product_desc in item.text:
@@ -68,7 +90,7 @@ class ChromeTest(unittest.TestCase):
         user_name = acc_page.get_user_name()
         self.assertEqual(user_name, test_data.USER_NAME)
 
-    def test_add_to_cart(self):
+    def test_add_product_to_cart(self):
         # Start from Main page and log in
         self.log_in()
 
@@ -91,8 +113,35 @@ class ChromeTest(unittest.TestCase):
         items = cart_page.get_items_table()
         self.check_product_in_cart(items=items, product_desc=product_desc)
 
-        # Clean up a cart
-        cart_page.clean_cart()
+    def test_add_products_to_cart(self):
+        # Start from Main page and log in
+        self.log_in()
+
+        # Turn back to main page
+        driver = self.current_page.get_driver()
+        main_page = pages.MainPage(driver=driver, url=test_data.MAIN_PAGE)
+
+        # Pick up few random products
+        number_of_products = 3
+        products = main_page.get_product_list()
+        p_list = [random.choice(products) for _ in range(number_of_products)]
+
+        # Try to add products to cart
+        count = 0
+        exp_total = 0.0
+        for product in p_list:
+            for i in range(random.randint(1, number_of_products)):
+
+                main_page.add_product_to_cart(product)
+                desc, price = self.format_product_desc(product.text)
+                count += 1
+                exp_total += price
+
+        # Check number of products and total price
+        cart_total = main_page.get_cart_total()
+        number, act_total = self.format_cart_total(cart_total)
+        self.assertEqual(count, number)
+        self.assertEqual(act_total, exp_total)
 
 
 if __name__ == '__main__':
