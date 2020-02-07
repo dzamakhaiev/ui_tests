@@ -12,3 +12,4 @@ CART_PAGE = 'https://elektroshokery.in.ua/shopping-cart/'
 
 # Products
 PRODUCT_MARKER = 'Электрошокер'
+PRICE_MARKER = 'грн'
