@@ -1,7 +1,11 @@
+from time import sleep
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver import Chrome
 from selenium.common.exceptions import NoSuchElementException
+
 import config
 
 
@@ -82,6 +86,7 @@ class BaseDriver:
             element.click()
         else:
             self.find_element(locator, element).click()
+        sleep(config.CALCULATING_TIME)  # when simple wait does not help and web app has low performance
 
     def input_text(self, locator, text, element=None):
         field = self.find_element(locator, element)
