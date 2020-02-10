@@ -3,7 +3,7 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver import Chrome
+from selenium.webdriver import Chrome, Edge
 from selenium.common.exceptions import NoSuchElementException
 
 import config
@@ -107,3 +107,9 @@ class ChromeDriver(BaseDriver):
         driver = Chrome(executable_path=driver_path)
         super().__init__(driver)
 
+
+class EdgeDriver(BaseDriver):
+
+    def __init__(self):
+        driver = Edge()
+        super().__init__(driver)
