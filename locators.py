@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 class MainPageLocators:
     LOGIN_LINK = (By.LINK_TEXT, 'Войти')
     PRODUCT_BLOCK = (By.CLASS_NAME, 'product-block')
+    PRODUCT_URL = (By.CLASS_NAME, 'name')
     BUY_BUTTON = (By.TAG_NAME, 'input')
     CART_TOTAL = (By.ID, 'cart-total')
 
@@ -14,6 +15,11 @@ class LoginPageLocators:
     PWD_FIELD = (By.NAME, 'password')
     LOG_IN_BUTTON = (By.XPATH, '//*[@id="content"]/div[2]/div/div[2]/div/form/div/input[3]')
     USER_LINK = (By.XPATH, '//*[@id="header"]/div/div/div[3]/div[1]/a[1]')
+
+
+class ProductPage:
+
+    BUY_BUTTON = (By.XPATH, '//*[@id="button-cart"]')
 
 
 class CartPageLocators:
