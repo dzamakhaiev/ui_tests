@@ -42,6 +42,9 @@ class MainPage(BasePage):
     def get_product_list(self):
         return self.driver.find_elements(locators.MainPageLocators.PRODUCT_BLOCK)
 
+    def click_on_product(self, product):
+        self.driver.click_on_element(locator=locators.MainPageLocators.PRODUCT_URL, element=product)
+
     def add_product_to_cart(self, product):
         self.driver.click_on_element(locator=locators.MainPageLocators.BUY_BUTTON, element=product)
 
@@ -61,6 +64,12 @@ class AccountPage(BasePage):
 
     def get_user_name(self):
         return self.driver.find_element(locators.LoginPageLocators.USER_LINK).text
+
+
+class ProductPage(BasePage):
+
+    def add_product_to_cart(self):
+        self.driver.click_on_element(locator=locators.ProductPage.BUY_BUTTON)
 
 
 class CartPage(BasePage):
