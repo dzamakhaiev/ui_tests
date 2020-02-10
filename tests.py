@@ -120,9 +120,9 @@ class ChromeTest(unittest.TestCase):
         count = 0
         exp_total = 0.0
         number_of_products = 10
+        products = main_page.get_product_list()
 
         for i in range(random.randint(1, number_of_products)):
-            products = main_page.get_product_list()
             product = random.choice(products)
             main_page.add_product_to_cart(product)
             desc, price = self.format_product_desc(product.text)
