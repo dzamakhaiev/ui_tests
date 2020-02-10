@@ -2,7 +2,7 @@ import random
 import unittest
 import pages
 import test_data
-from driver import ChromeDriver
+from driver import ChromeDriver, EdgeDriver
 
 
 class ChromeTest(unittest.TestCase):
@@ -137,6 +137,13 @@ class ChromeTest(unittest.TestCase):
         number, act_total = self.format_cart_total(cart_total)
         self.assertEqual(count, number)
         self.assertEqual(act_total, exp_total)
+
+
+class EdgeTest(ChromeTest):
+
+    def setUp(self):
+        # Start test case from Main page like regular user
+        self.current_page = pages.MainPage(driver=EdgeDriver(), url=test_data.MAIN_PAGE)
 
 
 if __name__ == '__main__':
