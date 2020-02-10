@@ -82,10 +82,15 @@ class BaseDriver:
             return element.find_elements(*locator)
 
     def click_on_element(self, locator=None, element=None):
+        """
+        :param tuple locator:
+        :param WebElement element:
+        """
         if not locator and element:
             element.click()
         else:
             self.find_element(locator, element).click()
+
         sleep(config.CALCULATING_TIME)  # when simple wait does not help and web app has low performance
 
     def input_text(self, locator, text, element=None):
