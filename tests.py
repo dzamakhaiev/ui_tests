@@ -97,12 +97,15 @@ class ChromeTest(unittest.TestCase):
         products = main_page.get_product_list()
         product = random.choice(products)
         product_desc = product.text
+        main_page.click_on_product(product)
 
-        # Try to add product to cart
-        main_page.add_product_to_cart(product)
+        # Try to add product to cart from product page
+        driver = main_page.get_driver()
+        product_page = pages.ProductPage(driver=driver, url=main_page.get_current_url())
+        product_page.add_product_to_cart()
 
         # Check cart
-        driver = main_page.get_driver()
+        driver = product_page.get_driver()
         cart_page = pages.CartPage(driver=driver, url=test_data.CART_PAGE)
         self.current_page = cart_page
         items = cart_page.get_items_table()
